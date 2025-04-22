@@ -11,5 +11,15 @@ namespace DevFreela.API.Controllers.v1
         {
             return Ok();
         }
+
+        [HttpPut("{id}/profile-picture")]
+        public async Task<IActionResult> AddProfilePicture(IFormFile file)
+        {
+            var description = $"File: {file.FileName}, Size: {file.Length}";
+
+            // Processar a imagem
+
+            return Ok(description);
+        }
     }
 }
