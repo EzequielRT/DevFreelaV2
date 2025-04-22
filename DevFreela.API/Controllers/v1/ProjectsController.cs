@@ -1,5 +1,6 @@
 ﻿using DevFreela.API.Models.Config;
 using DevFreela.API.Models.Input;
+using DevFreela.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -10,16 +11,20 @@ namespace DevFreela.API.Controllers.v1
     public class ProjectsController : ControllerBase
     {
         private readonly FreelanceTotalCostConfig _options;
+        private readonly IConfigService _configService;
 
-        public ProjectsController(IOptions<FreelanceTotalCostConfig> options)
+        public ProjectsController(
+            IOptions<FreelanceTotalCostConfig> options,
+            IConfigService configService)
         {
             _options = options.Value;
+            _configService = configService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string search)
+        public async Task<IActionResult> Get(string search = "")
         {
-            return Ok();
+            return Ok(_configService.GetValue());
         }
 
         [HttpGet("{id}")]
