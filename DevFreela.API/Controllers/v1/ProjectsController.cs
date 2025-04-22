@@ -1,5 +1,7 @@
-﻿using DevFreela.API.Models.Input;
+﻿using DevFreela.API.Models.Config;
+using DevFreela.API.Models.Input;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace DevFreela.API.Controllers.v1
 {
@@ -7,6 +9,13 @@ namespace DevFreela.API.Controllers.v1
     [ApiController]
     public class ProjectsController : ControllerBase
     {
+        private readonly FreelanceTotalCostConfig _options;
+
+        public ProjectsController(IOptions<FreelanceTotalCostConfig> options)
+        {
+            _options = options.Value;
+        }
+
         [HttpGet]
         public async Task<IActionResult> Get(string search)
         {
@@ -22,6 +31,10 @@ namespace DevFreela.API.Controllers.v1
         [HttpPost]
         public async Task<IActionResult> Post(CreateProjectInputModel input)
         {
+            if (input.TotalCost < _options.Minimum ||
+                input.TotalCost > _options.Maximum)
+                return BadRequest($"O valor deve estar entre {_options.Minimum} e {_options.Maximum}");
+
             return CreatedAtAction(nameof(GetById), new { id = 1 }, input);
         }
 
