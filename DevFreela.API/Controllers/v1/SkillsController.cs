@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DevFreela.API.Models.Input;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DevFreela.API.Controllers.v1
 {
@@ -13,7 +14,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post(CreateSkillInputModel input)
         {
             return Ok();
         }

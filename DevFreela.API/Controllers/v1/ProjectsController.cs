@@ -30,8 +30,6 @@ namespace DevFreela.API.Controllers.v1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            throw new Exception("Erro ao buscar o projeto");
-
             return Ok();
         }
 
