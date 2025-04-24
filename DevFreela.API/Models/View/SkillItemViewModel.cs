@@ -4,16 +4,18 @@ namespace DevFreela.API.Models.View
 {
     public class SkillItemViewModel
     {
-        public long Id { get; set; }
-        public string Description { get; set; }
+        public SkillItemViewModel(long id, string description)
+        {
+            Id = id;
+            Description = description;
+        }
+
+        public long Id { get; private set; }
+        public string Description { get; private set; }
 
         public static SkillItemViewModel FromEntity(Skill skill)
         {
-            return new()
-            {
-                Id = skill.Id,
-                Description = skill.Description
-            };
+            return new(skill.Id, skill.Description);
         }
     }
 }

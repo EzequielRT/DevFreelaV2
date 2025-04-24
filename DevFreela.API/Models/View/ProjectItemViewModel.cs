@@ -18,11 +18,11 @@ namespace DevFreela.API.Models.View
             TotalCost = totalCost;
         }
 
-        public long Id { get; set; }
-        public string Title { get; set; }
-        public string ClientFullName { get; set; }
-        public string FreelancerFullName { get; set; }
-        public decimal TotalCost { get; set; }
+        public long Id { get; private set; }
+        public string Title { get; private set; }
+        public string ClientFullName { get; private set; }
+        public string FreelancerFullName { get; private set; }
+        public decimal TotalCost { get; private set; }
 
         public static ProjectItemViewModel FromEntity(Project project)
         {

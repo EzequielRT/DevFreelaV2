@@ -67,8 +67,10 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(UpdateProjectInputModel input)
+        public async Task<IActionResult> Put(int id, UpdateProjectInputModel input)
         {
+            input.SetProjectId(id);
+
             var project = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
 
@@ -135,8 +137,10 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPost("{id}/comments")]
-        public async Task<IActionResult> PostComment(CreateProjectCommentInputModel input)
+        public async Task<IActionResult> PostComment(int id, CreateProjectCommentInputModel input)
         {
+            input.SetProjectId(id);
+
             var project = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
 

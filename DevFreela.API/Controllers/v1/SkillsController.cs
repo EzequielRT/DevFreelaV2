@@ -1,5 +1,4 @@
-﻿using DevFreela.API.Entities;
-using DevFreela.API.Models.Input;
+﻿using DevFreela.API.Models.Input;
 using DevFreela.API.Models.View;
 using DevFreela.API.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +30,7 @@ namespace DevFreela.API.Controllers.v1
         [HttpPost]
         public async Task<IActionResult> Post(CreateSkillInputModel input)
         {
-            var skill = new Skill(input.Description);
+            var skill = input.ToEntity();
 
             await _context.Skills.AddAsync(skill);
             await _context.SaveChangesAsync();

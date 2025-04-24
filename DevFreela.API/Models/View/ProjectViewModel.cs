@@ -26,15 +26,15 @@ namespace DevFreela.API.Models.View
             Comments = comments.Select(c => c.Content).ToList();
         }
 
-        public long Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public long ClientId { get; set; }
-        public string ClientFullName { get; set; }
-        public long FreelancerId { get; set; }
-        public string FreelancerFullName { get; set; }
-        public decimal TotalCost { get; set; }
-        public List<string> Comments { get; set; }
+        public long Id { get; private set; }
+        public string Title { get; private set; }
+        public string Description { get; private set; }
+        public long ClientId { get; private set; }
+        public string ClientFullName { get; private set; }
+        public long FreelancerId { get; private set; }
+        public string FreelancerFullName { get; private set; }
+        public decimal TotalCost { get; private set; }
+        public List<string> Comments { get; private set; }
 
         public static ProjectViewModel FromEntity(Project project)
         {
