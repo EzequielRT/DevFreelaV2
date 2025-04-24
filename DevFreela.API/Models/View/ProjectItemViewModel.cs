@@ -26,7 +26,7 @@ namespace DevFreela.API.Models.View
 
         public static ProjectItemViewModel FromEntity(Project project)
         {
-            return new (
+            return new(
                 project.Id,
                 project.Title,
                 project.Client.FullName,

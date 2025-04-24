@@ -38,7 +38,7 @@ namespace DevFreela.API.Models.View
 
         public static ProjectViewModel FromEntity(Project project)
         {
-            return new (
+            return new(
                 project.Id,
                 project.Title,
                 project.Description,

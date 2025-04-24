@@ -1,7 +1,9 @@
 ﻿using DevFreela.API.Models.Config;
 using DevFreela.API.Models.Input;
-using DevFreela.API.Services;
+using DevFreela.API.Models.View;
+using DevFreela.API.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace DevFreela.API.Controllers.v1
@@ -11,26 +13,42 @@ namespace DevFreela.API.Controllers.v1
     public class ProjectsController : ControllerBase
     {
         private readonly FreelanceTotalCostConfig _options;
-        private readonly IConfigService _configService;
+        private readonly DevFreelaDbContext _context;
 
         public ProjectsController(
             IOptions<FreelanceTotalCostConfig> options,
-            IConfigService configService)
+            DevFreelaDbContext context)
         {
             _options = options.Value;
-            _configService = configService;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get(string search = "")
         {
-            return Ok(_configService.GetValue());
+            var projects = await _context.Projects
+                .Include(p => p.Client)
+                .Include(p => p.Freelancer)
+                .Where(p => p.DeletedAt == null)
+                .ToListAsync();
+
+            var model = projects.Select(ProjectItemViewModel.FromEntity).ToList();
+
+            return Ok(model);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok();
+            var project = await _context.Projects
+                .Include(p => p.Client)
+                .Include(p => p.Freelancer)
+                .Include(p => p.Comments)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            var model = ProjectViewModel.FromEntity(project);
+
+            return Ok(model);
         }
 
         [HttpPost]
@@ -40,36 +58,96 @@ namespace DevFreela.API.Controllers.v1
                 input.TotalCost > _options.Maximum)
                 return BadRequest($"O valor deve estar entre {_options.Minimum} e {_options.Maximum}");
 
-            return CreatedAtAction(nameof(GetById), new { id = 1 }, input);
+            var project = input.ToEntity();
+
+            await _context.Projects.AddAsync(project);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new { id = project.Id }, input);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(UpdateProjectInputModel input)
         {
+            var project = await _context.Projects
+                .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
+
+            if (project == null)
+                return NotFound();
+
+            project.Update(input.Title, input.Description, input.TotalCost);
+
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            var project = await _context.Projects
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null)
+                return NotFound();
+
+            project.SetAsDeleted();
+
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
         [HttpPut("{id}/start")]
         public async Task<IActionResult> Start(int id)
         {
+            var project = await _context.Projects
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null)
+                return NotFound();
+
+            project.Start();
+
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
         [HttpPut("{id}/complete")]
         public async Task<IActionResult> Complete(int id)
         {
+            var project = await _context.Projects
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null)
+                return NotFound();
+
+            project.Complete();
+
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
         [HttpPost("{id}/comments")]
         public async Task<IActionResult> PostComment(CreateProjectCommentInputModel input)
         {
+            var project = await _context.Projects
+                .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
+
+            if (project == null)
+                return NotFound();
+
+            var comment = input.ToEntity();
+
+            await _context.ProjectComments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
     }
