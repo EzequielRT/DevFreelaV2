@@ -2,13 +2,13 @@
 {
     public class UserSkillsInputModel
     {
-        public UserSkillsInputModel(long userId, List<long> skillsIds)
+        public UserSkillsInputModel(long userId, List<long> skillIds)
         {
             UserId = userId;
-            SkillsIds = skillsIds;
+            SkillIds = skillIds;
         }
 
         public long UserId { get; set; }
-        public List<long> SkillsIds { get; set; }
+        public List<long> SkillIds { get; set; }
     }
 }
