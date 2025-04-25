@@ -7,7 +7,7 @@ namespace DevFreela.API.Models.Input
         public long UserId { get; private set; }
         public List<long> SkillIds { get; set; }
 
-        public void SetUserId(int id) => UserId = id;
+        public void SetUserId(long id) => UserId = id;
 
         public List<UserSkill> ToEntities()
             => SkillIds

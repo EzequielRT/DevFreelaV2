@@ -1,4 +1,5 @@
-﻿using DevFreela.API.Models.Config;
+﻿using DevFreela.API.Entities;
+using DevFreela.API.Models.Config;
 using DevFreela.API.Models.Input;
 using DevFreela.API.Models.View;
 using DevFreela.API.Persistence;
@@ -38,13 +39,16 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(long id)
         {
             var project = await _context.Projects
                 .Include(p => p.Client)
                 .Include(p => p.Freelancer)
                 .Include(p => p.Comments)
                 .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project is null)
+                return NotFound();
 
             var model = ProjectViewModel.FromEntity(project);
 
@@ -67,7 +71,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, UpdateProjectInputModel input)
+        public async Task<IActionResult> Put(long id, UpdateProjectInputModel input)
         {
             input.SetProjectId(id);
 
@@ -86,7 +90,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(long id)
         {
             var project = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -103,7 +107,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPut("{id}/start")]
-        public async Task<IActionResult> Start(int id)
+        public async Task<IActionResult> Start(long id)
         {
             var project = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -120,7 +124,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPut("{id}/complete")]
-        public async Task<IActionResult> Complete(int id)
+        public async Task<IActionResult> Complete(long id)
         {
             var project = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -137,7 +141,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPost("{id}/comments")]
-        public async Task<IActionResult> PostComment(int id, CreateProjectCommentInputModel input)
+        public async Task<IActionResult> PostComment(long id, CreateProjectCommentInputModel input)
         {
             input.SetProjectId(id);
 

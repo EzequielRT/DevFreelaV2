@@ -45,7 +45,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPost("{id}/skills")]
-        public async Task<IActionResult> PostSkills(int id, UserSkillsInputModel input)
+        public async Task<IActionResult> PostSkills(long id, UserSkillsInputModel input)
         {
             input.SetUserId(id);
 
@@ -58,7 +58,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpPut("{id}/profile-picture")]
-        public async Task<IActionResult> AddProfilePicture(int id, IFormFile file)
+        public async Task<IActionResult> AddProfilePicture(long id, IFormFile file)
         {
             var description = $"File: {file.FileName}, Size: {file.Length}";
 
