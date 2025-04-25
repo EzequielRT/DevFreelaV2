@@ -47,7 +47,7 @@ namespace DevFreela.API.Persistence
 
                     p.Property(p => p.FreelancerId)
                         .HasColumnType("bigint")
-                        .IsRequired(false);
+                        .IsRequired();
 
                     p.Property(p => p.TotalCost)
                         .HasColumnType("decimal(18,2)")

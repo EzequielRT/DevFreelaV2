@@ -13,8 +13,10 @@ builder.Services
 
 builder.Services.AddScoped<IConfigService, ConfigService>();
 
+//builder.Services.AddDbContext<DevFreelaDbContext>(options =>
+//    options.UseInMemoryDatabase("DevFreelaDb"));
 builder.Services.AddDbContext<DevFreelaDbContext>(options =>
-    options.UseInMemoryDatabase("DevFreelaDb"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DafaultConnection")));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandlerMiddleware>();
 builder.Services.AddProblemDetails();
