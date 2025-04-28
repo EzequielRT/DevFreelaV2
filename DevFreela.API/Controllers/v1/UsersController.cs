@@ -1,6 +1,6 @@
-﻿using DevFreela.API.Models.Input;
-using DevFreela.API.Models.View;
-using DevFreela.API.Persistence;
+﻿using DevFreela.Application.Models.Input;
+using DevFreela.Application.Models.View;
+using DevFreela.Infra.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
