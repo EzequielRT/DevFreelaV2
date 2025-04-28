@@ -25,12 +25,14 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(string? search = null)
+        public async Task<IActionResult> GetAll(string? search = null, int page = 0, int size = 2)
         {
             var query = _context.Projects
                 .Include(p => p.Client)
                 .Include(p => p.Freelancer)
                 .Where(p => p.DeletedAt == null)
+                .Skip(page * size)
+                .Take(size)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
