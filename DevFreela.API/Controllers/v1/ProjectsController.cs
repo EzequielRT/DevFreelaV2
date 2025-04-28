@@ -25,12 +25,22 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string search = "")
+        public async Task<IActionResult> GetAll(string? search = null)
         {
-            var projects = await _context.Projects
+            var query = _context.Projects
                 .Include(p => p.Client)
                 .Include(p => p.Freelancer)
                 .Where(p => p.DeletedAt == null)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query
+                    .Where(p => p.Title.Contains(search) ||
+                                p.Description.Contains(search));
+            }
+
+            var projects = await query
                 .ToListAsync();
 
             var model = projects.Select(ProjectItemViewModel.FromEntity).ToList();
