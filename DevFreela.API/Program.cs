@@ -1,12 +1,12 @@
 using DevFreela.API.Configs;
 using DevFreela.API.Middlewares;
+using DevFreela.Application;
 using DevFreela.Infra.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services
     .Configure<FreelanceTotalCostConfig>(builder.Configuration.GetSection("FreelanceTotalCostConfig"));
 
@@ -14,6 +14,8 @@ builder.Services
 //    options.UseInMemoryDatabase("DevFreelaDb"));
 builder.Services.AddDbContext<DevFreelaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DafaultConnection")));
+
+builder.Services.AddApplicationModule();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandlerMiddleware>();
 builder.Services.AddProblemDetails();

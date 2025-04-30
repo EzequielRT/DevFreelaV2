@@ -24,7 +24,7 @@ namespace DevFreela.API.Controllers.v1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(string? search = null, int page = 0, int size = 2)
+        public async Task<IActionResult> GetAll(string? search = null, int page = 0, int size = 10)
         {
             var query = _context.Projects
                 .Include(p => p.Client)
