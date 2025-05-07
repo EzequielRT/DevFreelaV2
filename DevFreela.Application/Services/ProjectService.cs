@@ -13,7 +13,7 @@ namespace DevFreela.Application.Services
         Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model);
         Task<ResultViewModel> DeleteAsync(long id);
         Task<ResultViewModel> StartAsync(long id);
-        Task<ResultViewModel> CompleteAsync(long id);        
+        Task<ResultViewModel> CompleteAsync(long id);
         Task<ResultViewModel> InsertCommentAsync(CreateProjectCommentInputModel model);
     }
 
@@ -47,7 +47,7 @@ namespace DevFreela.Application.Services
 
             var model = queryResult.Select(ProjectItemViewModel.FromEntity).ToList();
 
-            return new ResultViewModel<List<ProjectItemViewModel>>(model);
+            return ResultViewModel<List<ProjectItemViewModel>>.Success(model);
         }
 
         public async Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id)
@@ -59,11 +59,11 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project is null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             var model = ProjectViewModel.FromEntity(project);
 
-            return new ResultViewModel<ProjectViewModel>(model);
+            return ResultViewModel<ProjectViewModel>.Success(model);
         }
 
         public async Task<ResultViewModel<long>> InsertAsync(CreateProjectInputModel model)
@@ -73,7 +73,7 @@ namespace DevFreela.Application.Services
             await _context.Projects.AddAsync(project);
             await _context.SaveChangesAsync();
 
-            return new ResultViewModel<long>(project.Id);
+            return ResultViewModel<long>.Success(project.Id);
         }
 
         public async Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model)
@@ -82,7 +82,7 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
 
             if (project == null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             project.Update(model.Title, model.Description, model.TotalCost);
 
@@ -98,7 +98,7 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             project.SetAsDeleted();
 
@@ -114,7 +114,7 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             project.Start();
 
@@ -130,7 +130,7 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             project.Complete();
 
@@ -146,7 +146,7 @@ namespace DevFreela.Application.Services
                 .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
 
             if (project == null)
-                return ResultViewModel<ProjectViewModel>.Error("Projeto não encontrado");
+                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
             var comment = model.ToEntity();
 
