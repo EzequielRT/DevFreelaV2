@@ -9,7 +9,7 @@ namespace DevFreela.Application.Services
     {
         Task<ResultViewModel<List<ProjectItemViewModel>>> GetAllAsync(string? search = null, int page = 0, int size = 10);
         Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id);
-        Task<ResultViewModel<long>> InsertAsync(CreateProjectInputModel model);
+        Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model);
         Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model);
         Task<ResultViewModel> DeleteAsync(long id);
         Task<ResultViewModel> StartAsync(long id);
@@ -66,14 +66,14 @@ namespace DevFreela.Application.Services
             return ResultViewModel<ProjectViewModel>.Success(model);
         }
 
-        public async Task<ResultViewModel<long>> InsertAsync(CreateProjectInputModel model)
+        public async Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model)
         {
             var project = model.ToEntity();
 
             await _context.Projects.AddAsync(project);
             await _context.SaveChangesAsync();
 
-            return ResultViewModel<long>.Success(project.Id);
+            return ResultViewModel<object>.Success(new { project.Id });
         }
 
         public async Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model)

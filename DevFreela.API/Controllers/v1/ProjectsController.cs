@@ -1,9 +1,8 @@
 ﻿using DevFreela.API.Configs;
 using DevFreela.Application.Models.Input;
 using DevFreela.Application.Models.View;
-using DevFreela.Infra.Persistence;
+using DevFreela.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace DevFreela.API.Controllers.v1
@@ -13,57 +12,30 @@ namespace DevFreela.API.Controllers.v1
     public class ProjectsController : ControllerBase
     {
         private readonly FreelanceTotalCostConfig _options;
-        private readonly DevFreelaDbContext _context;
+        private readonly IProjectService _projectService;
 
         public ProjectsController(
             IOptions<FreelanceTotalCostConfig> options,
-            DevFreelaDbContext context)
+            IProjectService projectService)
         {
             _options = options.Value;
-            _context = context;
+            _projectService = projectService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll(string? search = null, int page = 0, int size = 10)
         {
-            var query = _context.Projects
-                .Include(p => p.Client)
-                .Include(p => p.Freelancer)
-                .Where(p => p.DeletedAt == null)
-                .Skip(page * size)
-                .Take(size)
-                .AsQueryable();
+            var result = await _projectService.GetAllAsync(search, page, size);
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query
-                    .Where(p => p.Title.Contains(search) ||
-                                p.Description.Contains(search));
-            }
-
-            var projects = await query
-                .ToListAsync();
-
-            var model = projects.Select(ProjectItemViewModel.FromEntity).ToList();
-
-            return Ok(model);
+            return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var project = await _context.Projects
-                .Include(p => p.Client)
-                .Include(p => p.Freelancer)
-                .Include(p => p.Comments)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (project is null)
-                return NotFound();
-
-            var model = ProjectViewModel.FromEntity(project);
-
-            return Ok(model);
+            var result = await _projectService.GetByIdAsync(id);
+            
+            return result.ToActionResult();
         }
 
         [HttpPost]
@@ -72,13 +44,10 @@ namespace DevFreela.API.Controllers.v1
             if (input.TotalCost < _options.Minimum ||
                 input.TotalCost > _options.Maximum)
                 return BadRequest($"O valor deve estar entre {_options.Minimum} e {_options.Maximum}");
+            
+            var result = await _projectService.InsertAsync(input);
 
-            var project = input.ToEntity();
-
-            await _context.Projects.AddAsync(project);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = project.Id }, input);
+            return result.ToActionResult();
         }
 
         [HttpPut("{id}")]
@@ -86,69 +55,33 @@ namespace DevFreela.API.Controllers.v1
         {
             input.SetProjectId(id);
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
+            var result = await _projectService.UpdateAsync(input);
 
-            if (project == null)
-                return NotFound();
-
-            project.Update(input.Title, input.Description, input.TotalCost);
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return result.ToActionResult();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var result = await _projectService.DeleteAsync(id);
 
-            if (project == null)
-                return NotFound();
-
-            project.SetAsDeleted();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return result.ToActionResult();
         }
 
         [HttpPut("{id}/start")]
         public async Task<IActionResult> Start(long id)
         {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var result = await _projectService.StartAsync(id);
 
-            if (project == null)
-                return NotFound();
-
-            project.Start();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return result.ToActionResult();
         }
 
         [HttpPut("{id}/complete")]
         public async Task<IActionResult> Complete(long id)
         {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var result = await _projectService.CompleteAsync(id);
 
-            if (project == null)
-                return NotFound();
-
-            project.Complete();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return result.ToActionResult();
         }
 
         [HttpPost("{id}/comments")]
@@ -156,18 +89,9 @@ namespace DevFreela.API.Controllers.v1
         {
             input.SetProjectId(id);
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == input.ProjectId);
+            var result = await _projectService.InsertCommentAsync(input);
 
-            if (project == null)
-                return NotFound();
-
-            var comment = input.ToEntity();
-
-            await _context.ProjectComments.AddAsync(comment);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            return result.ToActionResult();
         }
     }
 }
