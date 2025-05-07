@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using DevFreela.Application.Models.View;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace DevFreela.API.Middlewares
 {
@@ -7,19 +7,12 @@ namespace DevFreela.API.Middlewares
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            var details = new ProblemDetails
-            {
-                Title = "An error occurred while processing your request.",
-                Status = StatusCodes.Status500InternalServerError,
-                Detail = exception.Message,
-                Instance = httpContext.Request.Path
-            };
+            var result = ResultViewModel<object>.InternalError(exception.Message);
 
-            // Fazer o que preferir com o erro, como logar
+            httpContext.Response.StatusCode = (int)result.StatusCode;
+            httpContext.Response.ContentType = "application/json";
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            await httpContext.Response.WriteAsJsonAsync(details, cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(result, cancellationToken);
 
             return true;
         }
