@@ -8,7 +8,8 @@ namespace DevFreela.Application
         public static IServiceCollection AddApplicationModule(this IServiceCollection services)
         {
             services
-                .AddServices();
+            .AddServices()
+            .AddMediator();
 
             return services;
         }
@@ -17,6 +18,14 @@ namespace DevFreela.Application
         {
             services
                 .AddScoped<IProjectService, ProjectService>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddMediator(this IServiceCollection services)
+        {
+            services
+                .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));
 
             return services;
         }
