@@ -8,7 +8,20 @@ namespace DevFreela.API.Middlewares
     public class GlobalExceptionHandlerMiddleware : IExceptionHandler
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
+        {            
+            if (exception is OperationCanceledException)
+            {
+                httpContext.Response.StatusCode = 499;
+
+                await httpContext.Response.WriteAsJsonAsync(new
+                {
+                    message = "Requisição cancelada"
+                });
+
+                return true;
+            }
+
+
             HttpStatusCode statusCode;
             string message = exception.Message;
 
