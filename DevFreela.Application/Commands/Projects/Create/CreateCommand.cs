@@ -12,6 +12,5 @@ public record CreateCommand(
     decimal TotalCost
 ) : IRequest<ResultViewModel<CreateResponse>>
 {
-    public Project ToEntity() =>
-        new(Title, Description, ClientId, FreelancerId, TotalCost);
+    public Project ToEntity() => new(Title, Description, ClientId, FreelancerId, TotalCost);
 }

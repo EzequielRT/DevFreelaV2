@@ -1,4 +1,5 @@
 ﻿using DevFreela.Application.Commands.Projects.Create;
+using DevFreela.Application.Commands.Projects.Update;
 using DevFreela.Application.Models.Input;
 using DevFreela.Application.Models.View;
 using DevFreela.Application.Queries.Projects.GetAll;
@@ -33,14 +34,8 @@ public class ProjectsController : BaseApiController
         => await SendAsync(command, cancellationToken);
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(long id, UpdateProjectInputModel input)
-    {
-        input.SetProjectId(id);
-
-        var result = await _projectService.UpdateAsync(input);
-
-        return result.ToActionResult();
-    }
+    public async Task<IActionResult> Put([FromRoute] long id, [FromBody] UpdateCommand command, CancellationToken cancellationToken)
+        => await SendAsync(command.WithProjectId(id), cancellationToken);
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
