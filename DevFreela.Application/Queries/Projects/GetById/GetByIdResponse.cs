@@ -1,10 +1,10 @@
 ﻿using DevFreela.Core.Entities;
 
-namespace DevFreela.Application.Models.View;
+namespace DevFreela.Application.Queries.Projects.GetById;
 
-public class ProjectViewModel
+public class GetByIdResponse
 {
-    public ProjectViewModel(
+    public GetByIdResponse(
         long id,
         string title,
         string description,
@@ -36,7 +36,7 @@ public class ProjectViewModel
     public decimal TotalCost { get; private set; }
     public List<string> Comments { get; private set; }
 
-    public static ProjectViewModel FromEntity(Project project)
+    public static GetByIdResponse FromEntity(Project project)
     {
         return new(
             project.Id,
