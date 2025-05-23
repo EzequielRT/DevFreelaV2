@@ -1,16 +1,15 @@
-﻿namespace DevFreela.Core.Entities
+﻿namespace DevFreela.Core.Entities;
+
+public class Skill : BaseEntity
 {
-    public class Skill : BaseEntity
+    // EF Constructor
+    protected Skill() { }
+
+    public Skill(string description)
     {
-        // EF Constructor
-        protected Skill() { }
-
-        public Skill(string description)
-        {
-            Description = description;
-        }
-
-        public string Description { get; private set; }
-        public List<UserSkill> UserSkills { get; private set; }
+        Description = description;
     }
+
+    public string Description { get; private set; }
+    public List<UserSkill> UserSkills { get; private set; }
 }

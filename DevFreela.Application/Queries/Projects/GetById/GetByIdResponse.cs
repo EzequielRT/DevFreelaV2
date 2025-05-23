@@ -2,43 +2,19 @@
 
 namespace DevFreela.Application.Queries.Projects.GetById;
 
-public class GetByIdResponse
+public record GetByIdResponse(
+    long Id,
+    string Title,
+    string Description,
+    long ClientId,
+    string ClientFullName,
+    long FreelancerId,
+    string FreelancerFullName,
+    decimal TotalCost,
+    List<string> Comments)
 {
-    public GetByIdResponse(
-        long id,
-        string title,
-        string description,
-        long clientId,
-        string clientName,
-        long freelancerId,
-        string freelancerName,
-        decimal totalCost,
-        List<ProjectComment> comments)
-    {
-        Id = id;
-        Title = title;
-        Description = description;
-        ClientId = clientId;
-        ClientFullName = clientName;
-        FreelancerId = freelancerId;
-        FreelancerFullName = freelancerName;
-        TotalCost = totalCost;
-        Comments = comments.Select(c => c.Content).ToList();
-    }
-
-    public long Id { get; private set; }
-    public string Title { get; private set; }
-    public string Description { get; private set; }
-    public long ClientId { get; private set; }
-    public string ClientFullName { get; private set; }
-    public long FreelancerId { get; private set; }
-    public string FreelancerFullName { get; private set; }
-    public decimal TotalCost { get; private set; }
-    public List<string> Comments { get; private set; }
-
     public static GetByIdResponse FromEntity(Project project)
-    {
-        return new(
+        => new(
             project.Id,
             project.Title,
             project.Description,
@@ -47,6 +23,6 @@ public class GetByIdResponse
             project.FreelancerId,
             project.Freelancer.FullName,
             project.TotalCost,
-            project.Comments);
-    }
+            project.Comments.Select(c => c.Content).ToList()
+        );
 }

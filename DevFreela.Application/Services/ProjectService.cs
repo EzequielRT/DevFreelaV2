@@ -3,157 +3,156 @@ using DevFreela.Application.Models.View;
 using DevFreela.Infra.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace DevFreela.Application.Services
+namespace DevFreela.Application.Services;
+
+public interface IProjectService
 {
-    public interface IProjectService
+    Task<ResultViewModel<List<ProjectItemViewModel>>> GetAllAsync(string? search = null, int page = 0, int size = 10);
+    Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id);
+    Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model);
+    Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model);
+    Task<ResultViewModel> DeleteAsync(long id);
+    Task<ResultViewModel> StartAsync(long id);
+    Task<ResultViewModel> CompleteAsync(long id);
+    Task<ResultViewModel> InsertCommentAsync(CreateProjectCommentInputModel model);
+}
+
+public class ProjectService : IProjectService
+{        
+    private readonly DevFreelaDbContext _context;
+
+    public ProjectService(DevFreelaDbContext context)
     {
-        Task<ResultViewModel<List<ProjectItemViewModel>>> GetAllAsync(string? search = null, int page = 0, int size = 10);
-        Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id);
-        Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model);
-        Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model);
-        Task<ResultViewModel> DeleteAsync(long id);
-        Task<ResultViewModel> StartAsync(long id);
-        Task<ResultViewModel> CompleteAsync(long id);
-        Task<ResultViewModel> InsertCommentAsync(CreateProjectCommentInputModel model);
+        _context = context;
     }
 
-    public class ProjectService : IProjectService
-    {        
-        private readonly DevFreelaDbContext _context;
+    public async Task<ResultViewModel<List<ProjectItemViewModel>>> GetAllAsync(string? search = null, int page = 0, int size = 10)
+    {
+        var query = _context.Projects
+            .Include(p => p.Client)
+            .Include(p => p.Freelancer)
+            .Where(p => p.DeletedAt == null)
+            .Skip(page * size)
+            .Take(size)
+            .AsQueryable();
 
-        public ProjectService(DevFreelaDbContext context)
+        if (!string.IsNullOrWhiteSpace(search))
         {
-            _context = context;
+            query = query
+                .Where(p => p.Title.Contains(search) ||
+                            p.Description.Contains(search));
         }
 
-        public async Task<ResultViewModel<List<ProjectItemViewModel>>> GetAllAsync(string? search = null, int page = 0, int size = 10)
-        {
-            var query = _context.Projects
-                .Include(p => p.Client)
-                .Include(p => p.Freelancer)
-                .Where(p => p.DeletedAt == null)
-                .Skip(page * size)
-                .Take(size)
-                .AsQueryable();
+        var queryResult = await query.ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query
-                    .Where(p => p.Title.Contains(search) ||
-                                p.Description.Contains(search));
-            }
+        var model = queryResult.Select(ProjectItemViewModel.FromEntity).ToList();
 
-            var queryResult = await query.ToListAsync();
+        return ResultViewModel<List<ProjectItemViewModel>>.Success(model);
+    }
 
-            var model = queryResult.Select(ProjectItemViewModel.FromEntity).ToList();
+    public async Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id)
+    {
+        var project = await _context.Projects
+            .Include(p => p.Client)
+            .Include(p => p.Freelancer)
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
-            return ResultViewModel<List<ProjectItemViewModel>>.Success(model);
-        }
+        if (project is null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
-        public async Task<ResultViewModel<ProjectViewModel>> GetByIdAsync(long id)
-        {
-            var project = await _context.Projects
-                .Include(p => p.Client)
-                .Include(p => p.Freelancer)
-                .Include(p => p.Comments)
-                .FirstOrDefaultAsync(p => p.Id == id);
+        var model = ProjectViewModel.FromEntity(project);
 
-            if (project is null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+        return ResultViewModel<ProjectViewModel>.Success(model);
+    }
 
-            var model = ProjectViewModel.FromEntity(project);
+    public async Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model)
+    {
+        var project = model.ToEntity();
 
-            return ResultViewModel<ProjectViewModel>.Success(model);
-        }
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
 
-        public async Task<ResultViewModel<object>> InsertAsync(CreateProjectInputModel model)
-        {
-            var project = model.ToEntity();
+        return ResultViewModel<object>.Success(new { project.Id });
+    }
 
-            await _context.Projects.AddAsync(project);
-            await _context.SaveChangesAsync();
+    public async Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
 
-            return ResultViewModel<object>.Success(new { project.Id });
-        }
+        if (project == null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
-        public async Task<ResultViewModel> UpdateAsync(UpdateProjectInputModel model)
-        {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
+        project.Update(model.Title, model.Description, model.TotalCost);
 
-            if (project == null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
 
-            project.Update(model.Title, model.Description, model.TotalCost);
+        return ResultViewModel.Success();
+    }
+    
+    public async Task<ResultViewModel> DeleteAsync(long id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == id);
 
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
+        if (project == null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
-            return ResultViewModel.Success();
-        }
+        project.SetAsDeleted();
+
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+
+        return ResultViewModel.Success();
+    }
+
+    public async Task<ResultViewModel> StartAsync(long id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (project == null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+
+        project.Start();
+
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+
+        return ResultViewModel.Success();
+    }
+
+    public async Task<ResultViewModel> CompleteAsync(long id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (project == null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+
+        project.Complete();
+
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+
+        return ResultViewModel.Success();
+    }
+
+    public async Task<ResultViewModel> InsertCommentAsync(CreateProjectCommentInputModel model)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
+
+        if (project == null)
+            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+
+        var comment = model.ToEntity();
+
+        await _context.ProjectComments.AddAsync(comment);
+        await _context.SaveChangesAsync();
         
-        public async Task<ResultViewModel> DeleteAsync(long id)
-        {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (project == null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
-
-            project.SetAsDeleted();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return ResultViewModel.Success();
-        }
-
-        public async Task<ResultViewModel> StartAsync(long id)
-        {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (project == null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
-
-            project.Start();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return ResultViewModel.Success();
-        }
-
-        public async Task<ResultViewModel> CompleteAsync(long id)
-        {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (project == null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
-
-            project.Complete();
-
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
-
-            return ResultViewModel.Success();
-        }
-
-        public async Task<ResultViewModel> InsertCommentAsync(CreateProjectCommentInputModel model)
-        {
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == model.ProjectId);
-
-            if (project == null)
-                return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
-
-            var comment = model.ToEntity();
-
-            await _context.ProjectComments.AddAsync(comment);
-            await _context.SaveChangesAsync();
-            
-            return ResultViewModel.Success();
-        }
+        return ResultViewModel.Success();
     }
 }

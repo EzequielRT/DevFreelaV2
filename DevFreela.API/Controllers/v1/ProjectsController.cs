@@ -1,26 +1,22 @@
-﻿using DevFreela.API.Configs;
+﻿using DevFreela.Application.Commands.Projects.Create;
 using DevFreela.Application.Models.Input;
 using DevFreela.Application.Models.View;
 using DevFreela.Application.Queries.Projects.GetAll;
 using DevFreela.Application.Queries.Projects.GetById;
 using DevFreela.Application.Services;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using MediatR;
 
 namespace DevFreela.API.Controllers.v1;
 
 public class ProjectsController : BaseApiController
 {
-    private readonly FreelanceTotalCostConfig _options;
     private readonly IProjectService _projectService;
 
     public ProjectsController(
-        IOptions<FreelanceTotalCostConfig> options,
         IProjectService projectService,
         IMediator mediator) : base(mediator)
     {
-        _options = options.Value;
         _projectService = projectService;
     }
 
@@ -29,20 +25,12 @@ public class ProjectsController : BaseApiController
         => await SendAsync(query, cancellationToken);
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
         => await SendAsync(new GetByIdQuery(id), cancellationToken);
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateProjectInputModel input)
-    {
-        if (input.TotalCost < _options.Minimum ||
-            input.TotalCost > _options.Maximum)
-            return BadRequest($"O valor deve estar entre {_options.Minimum} e {_options.Maximum}");
-        
-        var result = await _projectService.InsertAsync(input);
-
-        return result.ToActionResult();
-    }
+    public async Task<IActionResult> Post([FromBody] CreateCommand command, CancellationToken cancellationToken)
+        => await SendAsync(command, cancellationToken);
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(long id, UpdateProjectInputModel input)

@@ -1,12 +1,11 @@
 ﻿using DevFreela.Core.Entities;
 
-namespace DevFreela.Application.Models.Input
-{
-    public class CreateSkillInputModel
-    {
-        public string Description { get; set; }
+namespace DevFreela.Application.Models.Input;
 
-        public Skill ToEntity()
-            => new(Description);
-    }
+public class CreateSkillInputModel
+{
+    public string Description { get; set; }
+
+    public Skill ToEntity()
+        => new(Description);
 }

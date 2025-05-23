@@ -16,8 +16,4 @@
 	<ProjectReference Include="..\DevFreela.Infra\DevFreela.Infra.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\Projects\" />
-  </ItemGroup>
-
 </Project>
