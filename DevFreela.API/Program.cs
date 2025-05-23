@@ -18,7 +18,6 @@ builder.Services.AddDbContext<DevFreelaDbContext>(options =>
 builder.Services.AddApplicationModule();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandlerMiddleware>();
-builder.Services.AddProblemDetails();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -34,7 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler();
+app.UseExceptionHandler(_ => { });
 
 app.UseHttpsRedirection();
 
