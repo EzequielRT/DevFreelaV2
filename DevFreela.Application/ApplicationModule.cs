@@ -9,7 +9,7 @@ namespace DevFreela.Application
         {
             services
             .AddServices()
-            .AddMediator();
+            .AddHandlers();
 
             return services;
         }
@@ -22,7 +22,7 @@ namespace DevFreela.Application
             return services;
         }
 
-        private static IServiceCollection AddMediator(this IServiceCollection services)
+        private static IServiceCollection AddHandlers(this IServiceCollection services)
         {
             services
                 .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));

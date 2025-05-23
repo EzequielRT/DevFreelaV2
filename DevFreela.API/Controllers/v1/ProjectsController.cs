@@ -1,33 +1,32 @@
 ﻿using DevFreela.API.Configs;
 using DevFreela.Application.Models.Input;
 using DevFreela.Application.Models.View;
+using DevFreela.Application.Queries.Projects.GetAll;
 using DevFreela.Application.Services;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace DevFreela.API.Controllers.v1
 {
-    [Route("api/v1/projects")]
-    [ApiController]
-    public class ProjectsController : ControllerBase
+    public class ProjectsController : BaseApiController
     {
         private readonly FreelanceTotalCostConfig _options;
         private readonly IProjectService _projectService;
 
         public ProjectsController(
             IOptions<FreelanceTotalCostConfig> options,
-            IProjectService projectService)
+            IProjectService projectService,
+            IMediator mediator) : base(mediator)
         {
             _options = options.Value;
             _projectService = projectService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(string? search = null, int page = 0, int size = 10)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllQuery query, CancellationToken cancellationToken)
         {
-            var result = await _projectService.GetAllAsync(search, page, size);
-
-            return result.ToActionResult();
+            return await SendAsync(query, cancellationToken);
         }
 
         [HttpGet("{id}")]
