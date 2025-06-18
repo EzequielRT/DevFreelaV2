@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using DevFreela.Application.Commands.Projects.Delete;
 using DevFreela.Application.Commands.Projects.Start;
+using DevFreela.Application.Commands.Projects.Complete;
 
 namespace DevFreela.API.Controllers.v1;
 
@@ -48,12 +49,8 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new StartCommand(id), cancellationToken);
 
     [HttpPut("{id}/complete")]
-    public async Task<IActionResult> Complete(long id)
-    {
-        var result = await _projectService.CompleteAsync(id);
-
-        return result.ToActionResult();
-    }
+    public async Task<IActionResult> Complete([FromRoute] long id, CancellationToken cancellationToken)
+        => await SendAsync(new CompleteCommand(id), cancellationToken);
 
     [HttpPost("{id}/comments")]
     public async Task<IActionResult> PostComment(long id, CreateProjectCommentInputModel input)
