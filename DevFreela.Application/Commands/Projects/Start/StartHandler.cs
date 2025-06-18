@@ -19,7 +19,7 @@ public class StartHandler : IRequestHandler<StartCommand, ResultViewModel>
         var project = await _context.Projects
             .FirstOrDefaultAsync(p => p.Id == request.Id);
 
-        if (project == null)
+        if (project is null)
             return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
 
         project.Start();
