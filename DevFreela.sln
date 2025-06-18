@@ -5,14 +5,6 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevFreela.API", "DevFreela.API\DevFreela.API.csproj", "{A71B727C-338D-4543-9A98-7A06452940A0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Core", "01 - Core", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Application", "02 - Application", "{A353ECD0-A6F3-4CC7-8212-81145B7C271B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Infra", "03 - Infra", "{97ABF5FF-25D8-47AB-AFDD-D061A4FD2DE3}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - API", "04 - API", "{7AC5EE64-73D4-4FA2-9538-6E9DCF114B07}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevFreela.Core", "DevFreela.Core\DevFreela.Core.csproj", "{6C818914-4C7C-493E-807B-277E278D7F3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevFreela.Application", "DevFreela.Application\DevFreela.Application.csproj", "{F92FCCE9-8F17-4265-BF79-2BC6ECA864D5}"
@@ -44,12 +36,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A71B727C-338D-4543-9A98-7A06452940A0} = {7AC5EE64-73D4-4FA2-9538-6E9DCF114B07}
-		{6C818914-4C7C-493E-807B-277E278D7F3D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{F92FCCE9-8F17-4265-BF79-2BC6ECA864D5} = {A353ECD0-A6F3-4CC7-8212-81145B7C271B}
-		{AFCC5509-6D49-417C-B792-4B08B133FC84} = {97ABF5FF-25D8-47AB-AFDD-D061A4FD2DE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5DFC038D-DA5B-4B33-AA83-913240B4E25C}
