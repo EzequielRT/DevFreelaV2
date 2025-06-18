@@ -17,6 +17,7 @@ builder.Services.AddDbContext<DevFreelaDbContext>(options =>
 
 builder.Services.AddApplicationModule();
 
+builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandlerMiddleware>();
 
 builder.Services.AddControllers();
@@ -33,7 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler(_ => { });
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

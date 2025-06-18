@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 
-namespace DevFreela.API.Controllers;
+namespace DevFreela.API.Controllers.v1;
 
 [ApiController]
 [Route("api/v1/[controller]")]
