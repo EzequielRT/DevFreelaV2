@@ -7,6 +7,7 @@ using DevFreela.Application.Queries.Projects.GetById;
 using DevFreela.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using DevFreela.Application.Commands.Projects.Delete;
 
 namespace DevFreela.API.Controllers.v1;
 
@@ -38,12 +39,8 @@ public class ProjectsController : BaseApiController
         => await SendAsync(command.WithProjectId(id), cancellationToken);
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(long id)
-    {
-        var result = await _projectService.DeleteAsync(id);
-
-        return result.ToActionResult();
-    }
+    public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
+        => await SendAsync(new DeleteCommand(id), cancellationToken);
 
     [HttpPut("{id}/start")]
     public async Task<IActionResult> Start(long id)
