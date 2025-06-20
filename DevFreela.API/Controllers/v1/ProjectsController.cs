@@ -24,26 +24,26 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new GetByIdQuery(id), cancellationToken);
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateCommand command)
         => await SendAsync(command);
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCommand command)
         => await SendAsync(command.WithProjectId(id));
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete([FromRoute] long id)
         => await SendAsync(new DeleteCommand(id));
 
     [HttpPut("{id}/start")]
-    public async Task<IActionResult> Start([FromRoute] long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Start([FromRoute] long id)
         => await SendAsync(new StartCommand(id));
 
     [HttpPut("{id}/complete")]
-    public async Task<IActionResult> Complete([FromRoute] long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Complete([FromRoute] long id)
         => await SendAsync(new CompleteCommand(id));
 
     [HttpPost("{id}/comments")]
-    public async Task<IActionResult> CreateComment([FromRoute] long id, [FromBody] CreateCommentCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateComment([FromRoute] long id, [FromBody] CreateCommentCommand command)
         => await SendAsync(command.WithProjectId(id));
 }

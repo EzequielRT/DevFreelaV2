@@ -1,4 +1,5 @@
-﻿using DevFreela.Application.Models.View;
+﻿using DevFreela.Application.Commands.Projects.Create.Notifications;
+using DevFreela.Application.Models.View;
 using DevFreela.Application.Settings;
 using DevFreela.Infra.Persistence;
 using MediatR;
@@ -10,11 +11,13 @@ public class CreateHandler : IRequestHandler<CreateCommand, ResultViewModel<Crea
 {
     private readonly DevFreelaDbContext _context;
     private readonly FreelanceTotalCostSettings _freelanceTotalCostSettings;
+    private readonly IMediator _mediator;
 
-    public CreateHandler(DevFreelaDbContext context, IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings)
+    public CreateHandler(DevFreelaDbContext context, IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings, IMediator mediator)
     {
         _context = context;
         _freelanceTotalCostSettings = freelanceTotalCostSettings.Value;
+        _mediator = mediator;
     }
 
     public async Task<ResultViewModel<CreateResponse>> Handle(CreateCommand request, CancellationToken cancellationToken)
@@ -27,6 +30,9 @@ public class CreateHandler : IRequestHandler<CreateCommand, ResultViewModel<Crea
 
         await _context.Projects.AddAsync(project);
         await _context.SaveChangesAsync();
+
+        var projectCreatedNotification = new ProjectCreatedNotification(project.Id, project.Title, project.TotalCost);
+        await _mediator.Publish(projectCreatedNotification);
 
         return ResultViewModel<CreateResponse>.Success(new CreateResponse(project.Id));
     }
