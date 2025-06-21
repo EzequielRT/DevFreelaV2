@@ -20,7 +20,7 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
             .FirstOrDefaultAsync(p => p.Id == request.ProjectId);
 
         if (project is null)
-            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+            return ResultViewModel.NotFound("Projeto não encontrado");
 
         var comment = request.ToEntity();
 

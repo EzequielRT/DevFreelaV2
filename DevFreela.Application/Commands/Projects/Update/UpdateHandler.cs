@@ -28,7 +28,7 @@ public class UpdateHandler : IRequestHandler<UpdateCommand, ResultViewModel>
             .FirstOrDefaultAsync(p => p.Id == request.ProjectId);
 
         if (project == null)
-            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+            return ResultViewModel.NotFound("Projeto não encontrado");
 
         project.Update(request.Title, request.Description, request.TotalCost);
 

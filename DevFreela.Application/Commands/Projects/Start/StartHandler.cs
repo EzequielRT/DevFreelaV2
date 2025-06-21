@@ -20,7 +20,7 @@ public class StartHandler : IRequestHandler<StartCommand, ResultViewModel>
             .FirstOrDefaultAsync(p => p.Id == request.Id);
 
         if (project is null)
-            return ResultViewModel<ProjectViewModel>.NotFound("Projeto não encontrado");
+            return ResultViewModel.NotFound("Projeto não encontrado");
 
         project.Start();
 
