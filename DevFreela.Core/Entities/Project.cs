@@ -5,6 +5,9 @@ namespace DevFreela.Core.Entities;
 
 public class Project : BaseEntity
 {
+    public const string INVALID_STATE_MESSAGE =
+        "O status atual não permite esta operação. Status: {0}";
+
     // EF Constructor
     protected Project() { }
 
@@ -36,7 +39,7 @@ public class Project : BaseEntity
     {
         if (Status == ProjectStatusEnum.InProgress ||
             Status == ProjectStatusEnum.Suspended)
-            throw new DomainException($"Status atual não permite o cancelamento do projeto. Status: {Status}");
+            throw new DomainException(string.Format(INVALID_STATE_MESSAGE, Status));
 
         Status = ProjectStatusEnum.Canceled;
     }
@@ -44,7 +47,7 @@ public class Project : BaseEntity
     public void Start()
     {
         if (Status != ProjectStatusEnum.Created)
-            throw new DomainException($"Status atual não permite o início do projeto. Status: {Status}");
+            throw new DomainException(string.Format(INVALID_STATE_MESSAGE, Status));
 
         StartedAt = DateTime.Now;
         Status = ProjectStatusEnum.InProgress;
@@ -53,7 +56,7 @@ public class Project : BaseEntity
     public void SetPaymentPending()
     {
         if (Status != ProjectStatusEnum.InProgress)
-            throw new DomainException($"Status atual não permite o pagamento. Status: {Status}");
+            throw new DomainException(string.Format(INVALID_STATE_MESSAGE, Status));
 
         Status = ProjectStatusEnum.PaymentPending;
     }
@@ -61,7 +64,7 @@ public class Project : BaseEntity
     public void Complete()
     {
         if (Status != ProjectStatusEnum.PaymentPending)
-            throw new DomainException($"Status atual não permite a conclusão do projeto. Status: {Status}");
+            throw new DomainException(string.Format(INVALID_STATE_MESSAGE, Status));
 
         CompletedAt = DateTime.Now;
         Status = ProjectStatusEnum.Completed;
