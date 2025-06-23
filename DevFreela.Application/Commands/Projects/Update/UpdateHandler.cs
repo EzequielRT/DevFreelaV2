@@ -1,20 +1,19 @@
 ﻿using DevFreela.Application.Models.View;
-using DevFreela.Infra.Persistence;
-using Microsoft.EntityFrameworkCore;
+using DevFreela.Application.Settings;
+using DevFreela.Core.Repositories;
 using Microsoft.Extensions.Options;
 using MediatR;
-using DevFreela.Application.Settings;
 
 namespace DevFreela.Application.Commands.Projects.Update;
 
 public class UpdateHandler : IRequestHandler<UpdateCommand, ResultViewModel>
 {
-    private readonly DevFreelaDbContext _context;
+    private readonly IProjectRepository _projectRepository;
     private readonly FreelanceTotalCostSettings _freelanceTotalCostSettings;
 
-    public UpdateHandler(DevFreelaDbContext context, IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings)
+    public UpdateHandler(IProjectRepository projectRepository, IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings)
     {
-        _context = context;
+        _projectRepository = projectRepository;
         _freelanceTotalCostSettings = freelanceTotalCostSettings.Value;
     }
 
@@ -24,16 +23,14 @@ public class UpdateHandler : IRequestHandler<UpdateCommand, ResultViewModel>
             request.TotalCost > _freelanceTotalCostSettings.Maximum)
             return ResultViewModel.Error($"O valor deve estar entre {_freelanceTotalCostSettings.Minimum} e {_freelanceTotalCostSettings.Maximum}");
 
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(p => p.Id == request.ProjectId);
+        var project = await _projectRepository.GetByIdAsync(request.ProjectId);
 
         if (project == null)
             return ResultViewModel.NotFound("Projeto não encontrado");
 
         project.Update(request.Title, request.Description, request.TotalCost);
 
-        _context.Projects.Update(project);
-        await _context.SaveChangesAsync();
+        await _projectRepository.UpdateAsync(project);
 
         return ResultViewModel.Success();
     }

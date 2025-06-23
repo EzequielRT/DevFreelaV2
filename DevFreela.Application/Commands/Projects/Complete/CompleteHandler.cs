@@ -1,31 +1,28 @@
 ﻿using DevFreela.Application.Models.View;
-using DevFreela.Infra.Persistence;
+using DevFreela.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace DevFreela.Application.Commands.Projects.Complete;
 
 public class CompleteHandler : IRequestHandler<CompleteCommand, ResultViewModel>
 {
-    private readonly DevFreelaDbContext _context;
+    private readonly IProjectRepository _projectRepository;
 
-    public CompleteHandler(DevFreelaDbContext context)
+    public CompleteHandler(IProjectRepository projectRepository)
     {
-        _context = context;
+        _projectRepository = projectRepository;
     }
 
     public async Task<ResultViewModel> Handle(CompleteCommand request, CancellationToken cancellationToken)
     {
-        var project = await _context.Projects
-            .FirstOrDefaultAsync(p => p.Id == request.Id);
+        var project = await _projectRepository.GetByIdAsync(request.Id);
 
         if (project is null)
             return ResultViewModel.NotFound("Projeto não encontrado");
 
         project.Complete();
 
-        _context.Projects.Update(project);
-        await _context.SaveChangesAsync();
+        await _projectRepository.UpdateAsync(project);
 
         return ResultViewModel.Success();
     }

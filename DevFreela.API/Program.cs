@@ -2,8 +2,7 @@ using DevFreela.API.Extensions;
 using DevFreela.API.Middlewares;
 using DevFreela.Application;
 using DevFreela.Application.Settings;
-using DevFreela.Infra.Persistence;
-using Microsoft.EntityFrameworkCore;
+using DevFreela.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +16,11 @@ builder.Services.AddRouting(opt => { opt.LowercaseUrls = true; });
 builder.Services
     .Configure<FreelanceTotalCostSettings>(builder.Configuration.GetSection("FreelanceTotalCostConfig"));
 
-//builder.Services.AddDbContext<DevFreelaDbContext>(options =>
-//    options.UseInMemoryDatabase("DevFreelaDb"));
-builder.Services.AddDbContext<DevFreelaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddSwaggerConfiguration();
-builder.Services.AddApplicationModule();
+
+builder.Services
+    .AddApplicationModule()
+    .AddInfraModule(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
