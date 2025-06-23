@@ -2,6 +2,7 @@
 using DevFreela.Application.Models.View;
 using DevFreela.Application.Settings;
 using DevFreela.Core.Repositories;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Options;
 
@@ -12,16 +13,26 @@ public class CreateHandler : IRequestHandler<CreateCommand, ResultViewModel<Crea
     private readonly IProjectRepository _projectRepository;
     private readonly FreelanceTotalCostSettings _freelanceTotalCostSettings;
     private readonly IMediator _mediator;
+    private readonly AbstractValidator<CreateCommand> _validator;
 
-    public CreateHandler(IProjectRepository projectRepository, IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings, IMediator mediator)
+    public CreateHandler(
+        IProjectRepository projectRepository,
+        IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings,
+        IMediator mediator,
+        AbstractValidator<CreateCommand> validator)
     {
         _projectRepository = projectRepository;
         _freelanceTotalCostSettings = freelanceTotalCostSettings.Value;
         _mediator = mediator;
+        _validator = validator;
     }
 
     public async Task<ResultViewModel<CreateResponse>> Handle(CreateCommand request, CancellationToken cancellationToken)
     {
+        var validate = _validator.Validate(request);
+        if (!validate.IsValid)
+            return ResultViewModel<CreateResponse>.Error(validate.Errors.First().ErrorMessage);
+
         if (request.TotalCost < _freelanceTotalCostSettings.Minimum ||
             request.TotalCost > _freelanceTotalCostSettings.Maximum)
             return ResultViewModel<CreateResponse>.Error($"O valor deve estar entre {_freelanceTotalCostSettings.Minimum} e {_freelanceTotalCostSettings.Maximum}");

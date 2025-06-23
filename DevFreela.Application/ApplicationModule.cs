@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DevFreela.Application.Commands.Projects.Create;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevFreela.Application;
 
@@ -7,7 +9,8 @@ public static class ApplicationModule
     public static IServiceCollection AddApplicationModule(this IServiceCollection services)
     {
         services
-            .AddHandlers();
+            .AddHandlers()
+            .AddValidators();
 
         return services;
     }
@@ -16,6 +19,13 @@ public static class ApplicationModule
     {
         services
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));
+
+        return services;
+    }
+
+    private static IServiceCollection AddValidators(this IServiceCollection services) 
+    {
+        services.AddScoped<AbstractValidator<CreateCommand>, CreateValidator>();
 
         return services;
     }
