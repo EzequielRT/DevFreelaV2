@@ -13,13 +13,13 @@ public class CreateHandler : IRequestHandler<CreateCommand, ResultViewModel<Crea
     private readonly IProjectRepository _projectRepository;
     private readonly FreelanceTotalCostSettings _freelanceTotalCostSettings;
     private readonly IMediator _mediator;
-    private readonly AbstractValidator<CreateCommand> _validator;
+    private readonly IValidator<CreateCommand> _validator;
 
     public CreateHandler(
         IProjectRepository projectRepository,
         IOptions<FreelanceTotalCostSettings> freelanceTotalCostSettings,
         IMediator mediator,
-        AbstractValidator<CreateCommand> validator)
+        IValidator<CreateCommand> validator)
     {
         _projectRepository = projectRepository;
         _freelanceTotalCostSettings = freelanceTotalCostSettings.Value;

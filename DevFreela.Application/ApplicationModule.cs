@@ -25,7 +25,7 @@ public static class ApplicationModule
 
     private static IServiceCollection AddValidators(this IServiceCollection services) 
     {
-        services.AddScoped<AbstractValidator<CreateCommand>, CreateValidator>();
+        services.AddScoped<IValidator<CreateCommand>, CreateValidator>();
 
         return services;
     }

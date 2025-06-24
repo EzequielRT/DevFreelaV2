@@ -13,4 +13,5 @@ public abstract class BaseEntity
     public bool IsDeleted => DeletedAt.HasValue;
 
     public void SetAsDeleted() => DeletedAt = DateTime.Now;
+    public void SetId(long id) => Id = id;
 }
