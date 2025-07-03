@@ -29,7 +29,7 @@ public class CreateHandler : IRequestHandler<CreateCommand, ResultViewModel<Crea
 
     public async Task<ResultViewModel<CreateResponse>> Handle(CreateCommand request, CancellationToken cancellationToken)
     {
-        var validate = _validator.Validate(request);
+        var validate = await _validator.ValidateAsync(request);
         if (!validate.IsValid)
             return ResultViewModel<CreateResponse>.Error(validate.Errors.First().ErrorMessage);
 
