@@ -2,13 +2,14 @@
 using DevFreela.Application.Settings;
 using DevFreela.Core.Entities;
 using DevFreela.Core.Repositories;
+using DevFreela.UnitTests.Fakes;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Moq;
 using NSubstitute;
-using FluentAssertions;
 
 namespace DevFreela.UnitTests.Application;
 
@@ -35,13 +36,7 @@ public class CreateProjectHandlerTests
             .AddAsync(Arg.Do<Project>(p => p.SetId(ID)))
             .Returns(ID);
 
-        var command = new CreateCommand(
-            Title: "Projeto A",
-            Description: "Descrição do Projeto",
-            ClientId: 1,
-            FreelancerId: 2,
-            TotalCost: 2500
-        );
+        var command = FakeDataHelper.CreateFakeCreateCommandV2();
         
         var handler = new CreateHandler(
             repository,
@@ -81,13 +76,7 @@ public class CreateProjectHandlerTests
         var validator = Mock.Of<IValidator<CreateCommand>>(v =>
             v.ValidateAsync(It.IsAny<CreateCommand>(), default) == Task.FromResult(new ValidationResult()));
 
-        var command = new CreateCommand(
-            Title: "Projeto A",
-            Description: "Descrição do Projeto",
-            ClientId: 1,
-            FreelancerId: 2,
-            TotalCost: 2500
-        );
+        var command = FakeDataHelper.CreateFakeCreateCommandV2();
 
         var repository = Mock.Of<IProjectRepository>(r =>
             r.AddAsync(It.IsAny<Project>()) == Task.FromResult(ID));

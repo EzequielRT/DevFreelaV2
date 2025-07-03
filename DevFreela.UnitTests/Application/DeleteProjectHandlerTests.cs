@@ -1,6 +1,7 @@
 ﻿using DevFreela.Application.Commands.Projects.Delete;
 using DevFreela.Core.Entities;
 using DevFreela.Core.Repositories;
+using DevFreela.UnitTests.Fakes;
 using FluentAssertions;
 using Moq;
 using NSubstitute;
@@ -15,13 +16,7 @@ public class DeleteProjectHandlerTests
         // Arrange
         const long ID = 1;
 
-        var project = new Project(
-            title: "Projeto A",
-            description: "Descrição do Projeto",
-            clientId: 1,
-            freelancerId: 2,
-            totalCost: 2500
-        );
+        var project = FakeDataHelper.CreateFakeProject();
 
         var repository = Substitute.For<IProjectRepository>();
         repository
@@ -32,7 +27,7 @@ public class DeleteProjectHandlerTests
             .UpdateAsync(project)
             .Returns(Task.CompletedTask);
 
-        var command = new DeleteCommand(ID);
+        var command = FakeDataHelper.CreateFakeDeleteCommand(ID);
         
         var handler = new DeleteHandler(repository);
 
@@ -51,19 +46,13 @@ public class DeleteProjectHandlerTests
         // Arrange
         const long ID = 1;
 
-        var project = new Project(
-            title: "Projeto A",
-            description: "Descrição do Projeto",
-            clientId: 1,
-            freelancerId: 2,
-            totalCost: 2500
-        );
+        var project = FakeDataHelper.CreateFakeProject();
 
         var repository = Mock.Of<IProjectRepository>(r => 
             r.GetByIdAsync(ID) == Task.FromResult(project) &&
             r.UpdateAsync(project) == Task.CompletedTask);
 
-        var command = new DeleteCommand(ID);
+        var command = FakeDataHelper.CreateFakeDeleteCommand(ID);
         
         var handler = new DeleteHandler(repository);
 
@@ -80,14 +69,14 @@ public class DeleteProjectHandlerTests
     public async Task ProjectDoesNotExists_Delete_Error_NSubstitute()
     {
         // Arrange
-        const int ID = 1;
+        const long ID = 1;
 
         var repository = Substitute.For<IProjectRepository>();
         repository
             .GetByIdAsync(ID)
             .Returns(Task.FromResult((Project?)null));
 
-        var command = new DeleteCommand(ID);
+        var command = FakeDataHelper.CreateFakeDeleteCommand(ID);
         
         var handler = new DeleteHandler(repository);
 
@@ -109,12 +98,12 @@ public class DeleteProjectHandlerTests
     public async Task ProjectDoesNotExists_Delete_Error_Moq()
     {
         // Arrange
-        const int ID = 1;
+        const long ID = 1;
 
         var repository = Mock.Of<IProjectRepository>(r => 
             r.GetByIdAsync(ID) == Task.FromResult((Project?)null));
 
-        var command = new DeleteCommand(ID);
+        var command = FakeDataHelper.CreateFakeDeleteCommand(ID);
         
         var handler = new DeleteHandler(repository);
 
