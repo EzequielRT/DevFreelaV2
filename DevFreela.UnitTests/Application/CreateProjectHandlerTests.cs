@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Moq;
 using NSubstitute;
+using FluentAssertions;
 
 namespace DevFreela.UnitTests.Application;
 
@@ -54,7 +55,11 @@ public class CreateProjectHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
+
         Assert.Equal(ID, result.Data.Id);
+        result.Data.Id.Should().Be(ID);
+
         await repository.Received(1).AddAsync(Arg.Any<Project>());
     }
 
@@ -108,7 +113,11 @@ public class CreateProjectHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
+
         Assert.Equal(ID, result.Data.Id);
+        result.Data.Id.Should().Be(ID);
+
         mockRepository.Verify(r => r.AddAsync(It.IsAny<Project>()), Times.Once);
     }
 }

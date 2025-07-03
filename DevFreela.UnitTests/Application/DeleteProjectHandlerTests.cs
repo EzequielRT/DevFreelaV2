@@ -1,6 +1,7 @@
 ﻿using DevFreela.Application.Commands.Projects.Delete;
 using DevFreela.Core.Entities;
 using DevFreela.Core.Repositories;
+using FluentAssertions;
 using Moq;
 using NSubstitute;
 
@@ -95,7 +96,11 @@ public class DeleteProjectHandlerTests
 
         // Assert
         Assert.False(result.IsSuccess);
+        result.IsSuccess.Should().BeFalse();
+
         Assert.Equal(DeleteHandler.PROJECT_NOT_FOUND_MESSAGE, result.Message);
+        result.Message.Should().Be(DeleteHandler.PROJECT_NOT_FOUND_MESSAGE);
+
         await repository.Received(1).GetByIdAsync(ID);
         await repository.DidNotReceive().UpdateAsync(Arg.Any<Project>());
     }
@@ -118,7 +123,11 @@ public class DeleteProjectHandlerTests
 
         // Assert
         Assert.False(result.IsSuccess);
+        result.IsSuccess.Should().BeFalse();
+
         Assert.Equal(DeleteHandler.PROJECT_NOT_FOUND_MESSAGE, result.Message);
+        result.Message.Should().Be(DeleteHandler.PROJECT_NOT_FOUND_MESSAGE);
+
         Mock.Get(repository).Verify(r => r.GetByIdAsync(ID), Times.Once);
         Mock.Get(repository).Verify(r => r.UpdateAsync(It.IsAny<Project>()), Times.Never);
     }
