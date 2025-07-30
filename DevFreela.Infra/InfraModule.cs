@@ -1,5 +1,6 @@
 ﻿using DevFreela.Core.Repositories;
 using DevFreela.Infra.Auth;
+using DevFreela.Infra.Email;
 using DevFreela.Infra.Persistence;
 using DevFreela.Infra.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,7 +18,8 @@ public static class InfraModule
     {
         services       
             .AddData(configuration)
-            .AddAuth(configuration)
+            .AddAuthService(configuration)
+            .AddEmailService()
             .AddRepositories();
 
         return services;
@@ -41,7 +43,7 @@ public static class InfraModule
         return services;
     }
 
-    private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddAuthService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAuthService, AuthService>();
 
@@ -60,6 +62,13 @@ public static class InfraModule
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!))
                 };
             });
+
+        return services;
+    }
+
+    private static IServiceCollection AddEmailService(this IServiceCollection services)
+    {
+        services.AddScoped<IEmailService, EmailService>();
 
         return services;
     }

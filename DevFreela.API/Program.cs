@@ -7,6 +7,7 @@ using DevFreela.Infra;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentJsonFiles(builder.Environment);
+builder.Configuration.AddUserSecrets<Program>();
 builder.AddLogging();
 
 builder.Services.AddProblemDetails();
@@ -25,6 +26,7 @@ builder.Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
