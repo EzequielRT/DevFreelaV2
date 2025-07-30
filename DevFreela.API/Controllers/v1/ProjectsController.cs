@@ -8,6 +8,7 @@ using DevFreela.Application.Queries.Projects.GetAll;
 using DevFreela.Application.Queries.Projects.GetById;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevFreela.API.Controllers.v1;
 
@@ -16,6 +17,7 @@ public class ProjectsController : BaseApiController
     public ProjectsController(IMediator mediator) : base(mediator) { }
 
     [HttpGet]
+    [Authorize(Roles = "freelancer, client")]
     public async Task<IActionResult> GetAll([FromQuery] GetAllQuery query, CancellationToken cancellationToken) 
         => await SendAsync(query, cancellationToken);
 
@@ -24,6 +26,7 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new GetByIdQuery(id), cancellationToken);
 
     [HttpPost]
+    [Authorize(Roles = "client")]
     public async Task<IActionResult> Create([FromBody] CreateCommand command)
         => await SendAsync(command);
 

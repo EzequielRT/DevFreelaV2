@@ -16,7 +16,7 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public Task<string> ComputeHash(string password)
+    public Task<string> ComputeHashAsync(string password)
     {
         using (var hash = SHA256.Create())
         {
@@ -33,11 +33,11 @@ public class AuthService : IAuthService
         }
     }
 
-    public Task<string> GenerateHash(string email, string role)
+    public Task<string> GenerateTokenAsync(string email, string role)
     {
-        var issuer = _configuration["Jwt:Issuer"];
-        var audience = _configuration["Jwt:Audience"];
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
+        var issuer = _configuration["JwtSettings:Issuer"];
+        var audience = _configuration["JwtSettings:Audience"];
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

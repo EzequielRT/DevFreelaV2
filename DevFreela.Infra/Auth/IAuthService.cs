@@ -2,6 +2,6 @@
 
 public interface IAuthService
 {
-    Task<string> ComputeHash(string password);
-    Task<string> GenerateHash(string email, string role);
+    Task<string> ComputeHashAsync(string password);
+    Task<string> GenerateTokenAsync(string email, string role);
 }

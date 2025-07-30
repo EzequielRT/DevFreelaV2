@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 namespace DevFreela.API.Extensions;
 
@@ -12,9 +13,32 @@ public static class SwaggerJwtExtension
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "API - Sedam",
+                Title = "API - DevFreela",
                 Version = "v1"
-            });            
+            });   
+            
+            var jwtScheme = new OpenApiSecurityScheme
+            {
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Description = "Coloque o token JWT no campo abaixo:\n\n**Bearer _seu_token_aqui_**",
+
+                Reference = new OpenApiReference
+                {
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            };
+
+            options.AddSecurityDefinition(jwtScheme.Reference.Id, jwtScheme);
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { jwtScheme, Array.Empty<string>() }
+            });
         });
 
         return services;

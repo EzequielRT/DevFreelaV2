@@ -1,10 +1,12 @@
 ﻿using DevFreela.Application.Models.View;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevFreela.API.Controllers.v1;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
