@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DevFreela.Infra.Persistence.Migrations
 {
     [DbContext(typeof(DevFreelaDbContext))]
-    [Migration("20250730012340_AddLoginInfo")]
+    [Migration("20250730032710_AddLoginInfo")]
     partial class AddLoginInfo
     {
         /// <inheritdoc />
@@ -160,11 +160,9 @@ namespace DevFreela.Infra.Persistence.Migrations
                         .HasColumnType("varchar(250)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("varchar(500)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");

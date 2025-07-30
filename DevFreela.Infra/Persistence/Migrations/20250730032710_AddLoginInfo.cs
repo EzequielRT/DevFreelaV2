@@ -14,15 +14,13 @@ namespace DevFreela.Infra.Persistence.Migrations
                 name: "Password",
                 table: "Users",
                 type: "varchar(500)",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Role",
                 table: "Users",
                 type: "varchar(50)",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
         }
 
         /// <inheritdoc />

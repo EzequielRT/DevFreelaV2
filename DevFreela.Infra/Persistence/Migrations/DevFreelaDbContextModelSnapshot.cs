@@ -157,11 +157,9 @@ namespace DevFreela.Infra.Persistence.Migrations
                         .HasColumnType("varchar(250)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("varchar(500)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
