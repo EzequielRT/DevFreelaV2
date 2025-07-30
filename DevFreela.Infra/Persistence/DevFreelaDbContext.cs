@@ -175,6 +175,12 @@ public class DevFreelaDbContext : DbContext
                     .HasColumnType("bit")
                     .IsRequired();
 
+                u.Property(u => u.Password)
+                    .HasColumnType("varchar(500)");
+
+                u.Property(u => u.Role)
+                    .HasColumnType("varchar(50)");
+
                 u.HasMany(u => u.Skills)
                     .WithOne(us => us.User)
                     .HasForeignKey(us => us.UserId)
