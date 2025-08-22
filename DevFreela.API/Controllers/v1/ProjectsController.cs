@@ -43,8 +43,8 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new StartCommand(id));
 
     [HttpPut("{id}/complete")]
-    public async Task<IActionResult> Complete([FromRoute] long id)
-        => await SendAsync(new CompleteCommand(id));
+    public async Task<IActionResult> Complete([FromBody] CompleteCommand command)
+        => await SendAsync(command);
 
     [HttpPost("{id}/comments")]
     public async Task<IActionResult> CreateComment([FromRoute] long id, [FromBody] CreateCommentCommand command)

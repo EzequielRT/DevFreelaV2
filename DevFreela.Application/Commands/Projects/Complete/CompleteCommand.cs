@@ -3,4 +3,12 @@ using MediatR;
 
 namespace DevFreela.Application.Commands.Projects.Complete;
 
-public record CompleteCommand(long Id) : IRequest<ResultViewModel>;
+public record CompleteCommand(
+    long ProjectId,
+    string CreditCardNumber,
+    string Cvv,
+    string ExpiresAt,
+    string FullName,
+    decimal Amount
+) : IRequest<ResultViewModel>;
+

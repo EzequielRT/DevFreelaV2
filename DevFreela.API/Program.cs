@@ -10,6 +10,7 @@ builder.Configuration.AddEnvironmentJsonFiles(builder.Environment);
 builder.Configuration.AddUserSecrets<Program>();
 builder.AddLogging();
 
+builder.Services.AddHttpClient();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandlerMiddleware>();
 builder.Services.AddRouting(opt => { opt.LowercaseUrls = true; });

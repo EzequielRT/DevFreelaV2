@@ -2,15 +2,10 @@
 
 namespace DevFreela.Payments.API.Services;
 
-public interface IPaymentService
-{
-    Task<bool> Process(PaymentInfoInputModel model);
-}
-
 public class PaymentService : IPaymentService
 {
-    public Task<bool> Process(PaymentInfoInputModel model)
+    public async Task<bool> Process(PaymentModel model)
     {
-        return Task.FromResult(true);
+        return await Task.FromResult(true);
     }
 }

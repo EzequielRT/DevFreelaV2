@@ -1,6 +1,7 @@
 ﻿using DevFreela.Core.Repositories;
 using DevFreela.Infra.Auth;
 using DevFreela.Infra.Email;
+using DevFreela.Infra.Payments;
 using DevFreela.Infra.Persistence;
 using DevFreela.Infra.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,7 @@ public static class InfraModule
             .AddData(configuration)
             .AddAuthService(configuration)
             .AddEmailService()
+            .AddPaymentService()
             .AddRepositories();
 
         return services;
@@ -69,6 +71,13 @@ public static class InfraModule
     private static IServiceCollection AddEmailService(this IServiceCollection services)
     {
         services.AddScoped<IEmailService, EmailService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddPaymentService(this IServiceCollection services)
+    {
+        services.AddScoped<IPaymentService, PaymentService>();
 
         return services;
     }
