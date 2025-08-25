@@ -1,9 +1,11 @@
-﻿using DevFreela.Core.Repositories;
+﻿using DevFreela.Core.Services;
+using DevFreela.Core.Repositories;
 using DevFreela.Infra.Auth;
 using DevFreela.Infra.Email;
 using DevFreela.Infra.Payments;
 using DevFreela.Infra.Persistence;
 using DevFreela.Infra.Repositories;
+using DevFreela.Infra.MessageBus;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +24,7 @@ public static class InfraModule
             .AddAuthService(configuration)
             .AddEmailService()
             .AddPaymentService()
+            .AddMessageBusService()
             .AddRepositories();
 
         return services;
@@ -78,6 +81,13 @@ public static class InfraModule
     private static IServiceCollection AddPaymentService(this IServiceCollection services)
     {
         services.AddScoped<IPaymentService, PaymentService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddMessageBusService(this IServiceCollection services)
+    {
+        services.AddScoped<IMessageBusService, MessageBusService>();
 
         return services;
     }

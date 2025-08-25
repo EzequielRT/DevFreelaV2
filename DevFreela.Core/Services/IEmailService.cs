@@ -1,4 +1,4 @@
-﻿namespace DevFreela.Infra.Email;
+﻿namespace DevFreela.Core.Services;
 
 public interface IEmailService
 {

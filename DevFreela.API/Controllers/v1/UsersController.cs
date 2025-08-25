@@ -1,7 +1,6 @@
 ﻿using DevFreela.Application.Models.Input;
 using DevFreela.Application.Models.View;
-using DevFreela.Infra.Auth;
-using DevFreela.Infra.Email;
+using DevFreela.Core.Services;
 using DevFreela.Infra.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

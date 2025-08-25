@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using DevFreela.Core.Services;
 using System.Net;
 using System.Net.Mail;
 

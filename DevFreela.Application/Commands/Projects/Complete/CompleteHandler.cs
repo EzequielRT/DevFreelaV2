@@ -1,6 +1,6 @@
 ﻿using DevFreela.Application.Models.View;
 using DevFreela.Core.Repositories;
-using DevFreela.Infra.Payments;
+using DevFreela.Core.Services;
 using MediatR;
 
 namespace DevFreela.Application.Commands.Projects.Complete;
@@ -23,7 +23,7 @@ public class CompleteHandler : IRequestHandler<CompleteCommand, ResultViewModel>
         if (project is null)
             return ResultViewModel.NotFound("Projeto não encontrado");
 
-        var paymentModel = new PaymentModel
+        await _paymentService.ProcessPaymentAsync
         (
             request.ProjectId,
             request.CreditCardNumber,
@@ -32,13 +32,8 @@ public class CompleteHandler : IRequestHandler<CompleteCommand, ResultViewModel>
             request.FullName,
             request.Amount
         );
-
-        var result = await _paymentService.ProcessPayment(paymentModel);
-
-        if (!result)
-            project.SetPaymentPending();
-
-        project.Complete();
+        
+        project.SetPaymentPending();
 
         await _projectRepository.UpdateAsync(project);
 

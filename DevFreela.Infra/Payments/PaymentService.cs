@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DevFreela.Core.Services;
 using System.Text;
 using System.Text.Json;
 
@@ -6,24 +6,25 @@ namespace DevFreela.Infra.Payments;
 
 public class PaymentService : IPaymentService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly string _paymentsBaseUrl;
+    private readonly IMessageBusService _messageBusService;
+    private const string QUEUE_NAME = "payments";
 
-    public PaymentService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public PaymentService(IMessageBusService messageBusService)
     {
-        _httpClientFactory = httpClientFactory;
-        _paymentsBaseUrl = configuration.GetSection("Services:Payments").Value!;
+        _messageBusService = messageBusService;
     }
 
-    public async Task<bool> ProcessPayment(PaymentModel model)
+    public async Task ProcessPaymentAsync(
+        long projectId, 
+        string creditCardNumber,
+        string cvv,
+        string expiresAt,
+        string fullName,
+        decimal amount)
     {
-        var url = $"{_paymentsBaseUrl}/api/payments";
+        var model = new PaymentModel(projectId, creditCardNumber, cvv,expiresAt, fullName, amount);
         var paymentInfoJson = JsonSerializer.Serialize(model);
-        var paymentInfoContent = new StringContent(paymentInfoJson, Encoding.UTF8, "application/json");
-
-        var httpClient = _httpClientFactory.CreateClient("Payments");
-        var response = await httpClient.PostAsync(url, paymentInfoContent);
-
-        return response.IsSuccessStatusCode;
+        var paymentInfoBytes = Encoding.UTF8.GetBytes(paymentInfoJson);
+        await _messageBusService.PublishAsync(QUEUE_NAME, paymentInfoBytes);
     }
 }

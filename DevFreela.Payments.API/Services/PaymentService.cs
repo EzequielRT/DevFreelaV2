@@ -4,7 +4,7 @@ namespace DevFreela.Payments.API.Services;
 
 public class PaymentService : IPaymentService
 {
-    public async Task<bool> Process(PaymentModel model)
+    public async Task<bool> ProcessAsync(PaymentModel model)
     {
         return await Task.FromResult(true);
     }

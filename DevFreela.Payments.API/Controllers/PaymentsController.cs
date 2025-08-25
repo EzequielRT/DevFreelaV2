@@ -18,7 +18,7 @@ public class PaymentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] PaymentModel model)
     {
-        var result = await _paymentService.Process(model);
+        var result = await _paymentService.ProcessAsync(model);
 
         if (!result)
             return BadRequest();
