@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace DevFreela.API.Controllers.v1;
 
 [ApiController]
-[Authorize]
+//[Authorize]
 [Route("api/v1/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {

@@ -1,6 +1,6 @@
 ﻿namespace DevFreela.Payments.API.Models;
 
-public record PaymentModel
+public record PaymentInfoInputModel
 {
     public long ProjectId { get; set; }
     public string CreditCardNumber { get; set; }

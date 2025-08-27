@@ -1,6 +1,6 @@
 ﻿namespace DevFreela.Infra.Payments;
 
-public record PaymentModel(
+public record PaymentInfoInputModel(
     long ProjectId,
     string CreditCardNumber,
     string Cvv,

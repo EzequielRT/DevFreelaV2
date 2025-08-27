@@ -16,7 +16,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] PaymentModel model)
+    public async Task<IActionResult> Post([FromBody] PaymentInfoInputModel model)
     {
         var result = await _paymentService.ProcessAsync(model);
 

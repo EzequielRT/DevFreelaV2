@@ -6,9 +6,9 @@ using DevFreela.Application.Commands.Projects.Start;
 using DevFreela.Application.Commands.Projects.Update;
 using DevFreela.Application.Queries.Projects.GetAll;
 using DevFreela.Application.Queries.Projects.GetById;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 
 namespace DevFreela.API.Controllers.v1;
 
@@ -43,8 +43,8 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new StartCommand(id));
 
     [HttpPut("{id}/complete")]
-    public async Task<IActionResult> Complete([FromBody] CompleteCommand command)
-        => await SendAsync(command);
+    public async Task<IActionResult> Complete([FromRoute] long id, [FromBody] CompleteCommand command)
+        => await SendAsync(command.WithProjectId(id));
 
     [HttpPost("{id}/comments")]
     public async Task<IActionResult> CreateComment([FromRoute] long id, [FromBody] CreateCommentCommand command)

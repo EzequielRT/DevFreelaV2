@@ -1,4 +1,5 @@
 ﻿using DevFreela.Application.Commands.Projects.Create;
+using DevFreela.Application.Consumers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,8 @@ public static class ApplicationModule
     {
         services
             .AddHandlers()
-            .AddValidators();
+            .AddValidators()
+            .AddBackgroundServices();
 
         return services;
     }
@@ -26,6 +28,13 @@ public static class ApplicationModule
     private static IServiceCollection AddValidators(this IServiceCollection services) 
     {
         services.AddScoped<IValidator<CreateCommand>, CreateValidator>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddBackgroundServices(this IServiceCollection services) 
+    {
+        services.AddHostedService<PaymentApprovedConsumer>();
 
         return services;
     }

@@ -1,15 +1,16 @@
-﻿using DevFreela.Payments.API.Models;
-using DevFreela.Payments.API.Services;
+﻿using DevFreela.Core.IntegrationEvents;
+using DevFreela.Core.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
-namespace DevFreela.Payments.API.Consumers;
+namespace DevFreela.Application.Consumers;
 
-public class ProcessPaymentConsumer : BackgroundService
+public class PaymentApprovedConsumer : BackgroundService
 {
-    private const string QUEUE_NAME = "payments";
     private const string PAYMENT_APPROVED_QUEUE_NAME = "payments-approved";
 
     private readonly IServiceProvider _serviceProvider;
@@ -17,7 +18,7 @@ public class ProcessPaymentConsumer : BackgroundService
     private IConnection _connection;
     private IChannel _channel;
 
-    public ProcessPaymentConsumer(IServiceProvider serviceProvider)
+    public PaymentApprovedConsumer(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
 
@@ -34,7 +35,6 @@ public class ProcessPaymentConsumer : BackgroundService
         _connection = await _factory.CreateConnectionAsync();
         _channel = await _connection.CreateChannelAsync();
 
-        await DeclareQueue(QUEUE_NAME);
         await DeclareQueue(PAYMENT_APPROVED_QUEUE_NAME);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
@@ -42,16 +42,15 @@ public class ProcessPaymentConsumer : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var json = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-            var paymentInfo = JsonSerializer.Deserialize<PaymentInfoInputModel>(json);
+            var paymentApprovedIntegrationEvent = JsonSerializer.Deserialize<PaymentApprovedIntegrationEvent>(json);
 
-            if (paymentInfo is null) return;
+            if (paymentApprovedIntegrationEvent is null) return;
 
-            await ProcessPaymentAsync(scope, paymentInfo);
-            await PublishPaymentApprovedEvent(paymentInfo.ProjectId);
+            await ProcessPaymentApprovedEventAsync(scope, paymentApprovedIntegrationEvent);
             await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
         };
 
-        await _channel.BasicConsumeAsync(QUEUE_NAME, autoAck: false, consumer);
+        await _channel.BasicConsumeAsync(PAYMENT_APPROVED_QUEUE_NAME, autoAck: false, consumer);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -76,22 +75,14 @@ public class ProcessPaymentConsumer : BackgroundService
         );
     }
 
-    private async Task PublishPaymentApprovedEvent(long projectId)
+    private async Task ProcessPaymentApprovedEventAsync(IServiceScope scope, PaymentApprovedIntegrationEvent paymentApprovedIntegrationEvent)
     {
-        var integrationEvent = new PaymentApprovedIntegrationEvent(projectId);
-        var json = JsonSerializer.Serialize(integrationEvent);
-        var body = Encoding.UTF8.GetBytes(json);
+        var projectRepository = scope.ServiceProvider.GetRequiredService<IProjectRepository>();
 
-        await _channel.BasicPublishAsync(
-            exchange: string.Empty,
-            routingKey: PAYMENT_APPROVED_QUEUE_NAME,
-            body: body
-        );
-    }
+        var project = await projectRepository.GetByIdAsync(paymentApprovedIntegrationEvent.ProjectId);
 
-    private async Task ProcessPaymentAsync(IServiceScope scope, PaymentInfoInputModel paymentInfo)
-    {
-        var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
-        await paymentService.ProcessAsync(paymentInfo);
+        project!.Complete();
+
+        await projectRepository.UpdateAsync(project);
     }
 }

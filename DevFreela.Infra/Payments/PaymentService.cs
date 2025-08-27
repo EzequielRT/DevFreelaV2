@@ -22,7 +22,7 @@ public class PaymentService : IPaymentService
         string fullName,
         decimal amount)
     {
-        var model = new PaymentModel(projectId, creditCardNumber, cvv,expiresAt, fullName, amount);
+        var model = new PaymentInfoInputModel(projectId, creditCardNumber, cvv,expiresAt, fullName, amount);
         var paymentInfoJson = JsonSerializer.Serialize(model);
         var paymentInfoBytes = Encoding.UTF8.GetBytes(paymentInfoJson);
         await _messageBusService.PublishAsync(QUEUE_NAME, paymentInfoBytes);
