@@ -40,13 +40,12 @@ public class PaymentApprovedConsumer : BackgroundService
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (sender, eventArgs) =>
         {
-            using var scope = _serviceProvider.CreateScope();
             var json = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             var paymentApprovedIntegrationEvent = JsonSerializer.Deserialize<PaymentApprovedIntegrationEvent>(json);
 
             if (paymentApprovedIntegrationEvent is null) return;
 
-            await ProcessPaymentApprovedEventAsync(scope, paymentApprovedIntegrationEvent);
+            await ProcessPaymentApprovedEventAsync(paymentApprovedIntegrationEvent);
             await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
         };
 
@@ -75,8 +74,9 @@ public class PaymentApprovedConsumer : BackgroundService
         );
     }
 
-    private async Task ProcessPaymentApprovedEventAsync(IServiceScope scope, PaymentApprovedIntegrationEvent paymentApprovedIntegrationEvent)
+    private async Task ProcessPaymentApprovedEventAsync(PaymentApprovedIntegrationEvent paymentApprovedIntegrationEvent)
     {
+        using var scope = _serviceProvider.CreateScope();
         var projectRepository = scope.ServiceProvider.GetRequiredService<IProjectRepository>();
 
         var project = await projectRepository.GetByIdAsync(paymentApprovedIntegrationEvent.ProjectId);

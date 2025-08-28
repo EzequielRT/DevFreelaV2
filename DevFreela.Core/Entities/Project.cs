@@ -51,14 +51,6 @@ public class Project : BaseEntity
 
         StartedAt = DateTime.Now;
         Status = ProjectStatusEnum.InProgress;
-    }     
-
-    public void SetPaymentPending()
-    {
-        if (Status != ProjectStatusEnum.InProgress)
-            throw new DomainException(string.Format(INVALID_STATE_MESSAGE, Status));
-
-        Status = ProjectStatusEnum.PaymentPending;
     }
 
     public void Complete()

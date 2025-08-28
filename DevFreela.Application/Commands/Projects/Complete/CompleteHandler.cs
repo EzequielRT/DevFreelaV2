@@ -33,10 +33,6 @@ public class CompleteHandler : IRequestHandler<CompleteCommand, ResultViewModel>
             request.Amount
         );
         
-        project.SetPaymentPending();
-
-        await _projectRepository.UpdateAsync(project);
-
         return ResultViewModel.Success();
     }
 }
