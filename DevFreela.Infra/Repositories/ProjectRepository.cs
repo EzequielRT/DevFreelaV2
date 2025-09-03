@@ -14,12 +14,8 @@ public class ProjectRepository : IProjectRepository
         _context = context;
     }
 
-    public async Task<long> AddAsync(Project project)
-    {
-        await _context.Projects.AddAsync(project);
-        await _context.SaveChangesAsync();
-        return project.Id;
-    }
+    public async Task AddAsync(Project project)
+        => await _context.Projects.AddAsync(project);
 
     public async Task AddCommentAsync(ProjectComment comment)
     {

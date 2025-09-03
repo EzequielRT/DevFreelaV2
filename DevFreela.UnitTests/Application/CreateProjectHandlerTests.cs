@@ -1,7 +1,7 @@
 ﻿using DevFreela.Application.Commands.Projects.Create;
 using DevFreela.Application.Settings;
 using DevFreela.Core.Entities;
-using DevFreela.Core.Repositories;
+using DevFreela.Core.UnitOfWork;
 using DevFreela.UnitTests.Fakes;
 using FluentAssertions;
 using FluentValidation;
@@ -31,15 +31,15 @@ public class CreateProjectHandlerTests
             .ValidateAsync(Arg.Any<CreateCommand>())
             .Returns(new ValidationResult());
 
-        var repository = Substitute.For<IProjectRepository>();
-        repository
-            .AddAsync(Arg.Do<Project>(p => p.SetId(ID)))
-            .Returns(ID);
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        await unitOfWork
+            .Projects
+            .AddAsync(Arg.Do<Project>(p => p.SetId(ID)));
 
         var command = FakeDataHelper.CreateFakeCreateCommandV2();
         
         var handler = new CreateHandler(
-            repository,
+            unitOfWork,
             options,
             mediator,
             validator
@@ -52,10 +52,10 @@ public class CreateProjectHandlerTests
         Assert.True(result.IsSuccess);
         result.IsSuccess.Should().BeTrue();
 
-        Assert.Equal(ID, result.Data.Id);
-        result.Data.Id.Should().Be(ID);
+        Assert.Equal(ID, result.Data?.Id);
+        result.Data?.Id.Should().Be(ID);
 
-        await repository.Received(1).AddAsync(Arg.Any<Project>());
+        await unitOfWork.Projects.Received(1).AddAsync(Arg.Any<Project>());
     }
 
     [Fact]
@@ -78,20 +78,19 @@ public class CreateProjectHandlerTests
 
         var command = FakeDataHelper.CreateFakeCreateCommandV2();
 
-        var repository = Mock.Of<IProjectRepository>(r =>
-            r.AddAsync(It.IsAny<Project>()) == Task.FromResult(ID));
+        var unitOfWork = Mock.Of<IUnitOfWork>(r =>
+            r.Projects.AddAsync(It.IsAny<Project>()) == Task.FromResult(ID));
 
-        var mockRepository = Mock.Get(repository);
+        var mockRepository = Mock.Get(unitOfWork);
         mockRepository
-            .Setup(r => r.AddAsync(It.IsAny<Project>()))
+            .Setup(r => r.Projects.AddAsync(It.IsAny<Project>()))
             .Callback<Project>(p =>
             {
                 p.SetId(ID);
-            })
-            .ReturnsAsync(ID);
+            });
 
         var handler = new CreateHandler(
-            repository,
+            unitOfWork,
             options,
             mediator,
             validator
@@ -104,9 +103,9 @@ public class CreateProjectHandlerTests
         Assert.True(result.IsSuccess);
         result.IsSuccess.Should().BeTrue();
 
-        Assert.Equal(ID, result.Data.Id);
-        result.Data.Id.Should().Be(ID);
+        Assert.Equal(ID, result.Data?.Id);
+        result.Data?.Id.Should().Be(ID);
 
-        mockRepository.Verify(r => r.AddAsync(It.IsAny<Project>()), Times.Once);
+        mockRepository.Verify(r => r.Projects.AddAsync(It.IsAny<Project>()), Times.Once);
     }
 }

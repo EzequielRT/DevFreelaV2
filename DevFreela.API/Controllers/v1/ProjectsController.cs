@@ -26,7 +26,7 @@ public class ProjectsController : BaseApiController
         => await SendAsync(new GetByIdQuery(id), cancellationToken);
 
     [HttpPost]
-    [Authorize(Roles = "client")]
+    //[Authorize(Roles = "client")]
     public async Task<IActionResult> Create([FromBody] CreateCommand command)
         => await SendAsync(command);
 
