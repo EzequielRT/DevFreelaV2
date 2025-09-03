@@ -17,7 +17,7 @@ public class ProjectsController : BaseApiController
     public ProjectsController(IMediator mediator) : base(mediator) { }
 
     [HttpGet]
-    [Authorize(Roles = "freelancer, client")]
+    //[Authorize(Roles = "freelancer, client")]
     public async Task<IActionResult> GetAll([FromQuery] GetAllQuery query, CancellationToken cancellationToken) 
         => await SendAsync(query, cancellationToken);
 

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace DevFreela.Application.Queries.Projects.GetAll;
 
-public class GetAllHandler : IRequestHandler<GetAllQuery, ResultViewModel<List<GetAllResponse>>>
+public class GetAllHandler : IRequestHandler<GetAllQuery, ResultViewModel<GetAllResponse>>
 {
     private readonly IProjectRepository _projectRepository;
 
@@ -13,13 +13,15 @@ public class GetAllHandler : IRequestHandler<GetAllQuery, ResultViewModel<List<G
         _projectRepository = projectRepository;
     }
 
-    public async Task<ResultViewModel<List<GetAllResponse>>> Handle(GetAllQuery request, CancellationToken cancellationToken)
+    public async Task<ResultViewModel<GetAllResponse>> Handle(GetAllQuery request, CancellationToken cancellationToken)
     {
         var queryResult = await _projectRepository
             .GetAllAsync(request.Search, request.Page, request.Size, cancellationToken);
 
-        var model = queryResult.Select(GetAllResponse.FromEntity).ToList();
+        var projects = queryResult.Item1.Select(GetAllItemResponse.FromEntity).ToList();
+        var count = queryResult.Item2;
+        var model = new GetAllResponse(projects, count);
 
-        return ResultViewModel<List<GetAllResponse>>.Success(model);
+        return ResultViewModel<GetAllResponse>.Success(model);
     }
 }

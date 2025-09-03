@@ -34,18 +34,16 @@ public class ProjectRepository : IProjectRepository
             .AnyAsync(p => p.Id == id);
     }
 
-    public async Task<List<Project>> GetAllAsync(string? search = null, int page = 0, int size = 10, CancellationToken cancellationToken = default)
+    public async Task<(List<Project>, int)> GetAllAsync(string? search = null, int page = 0, int size = 10, CancellationToken cancellationToken = default)
     {
         var query = _context.Projects
             .AsNoTracking()
             .Include(p => p.Client)
             .Include(p => p.Freelancer)
-            .Where(p => p.DeletedAt == null)
-            .OrderBy(p => p.Title)
-            .Skip(page * size)
-            .Take(size)
+            .Where(p => p.DeletedAt == null)            
             .AsQueryable();
 
+        search = search?.Trim();
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query
@@ -53,9 +51,15 @@ public class ProjectRepository : IProjectRepository
                             p.Description.Contains(search));
         }
 
-        var queryResult = await query.ToListAsync(cancellationToken);
+        var count = await query.CountAsync();
 
-        return queryResult;
+        var queryResult = await query
+            .OrderBy(p => p.Title)
+            .Skip(page * size)
+            .Take(size)
+            .ToListAsync(cancellationToken);
+
+        return (queryResult, count);
     }
 
     public async Task<Project?> GetByIdAsync(long id)
