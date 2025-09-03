@@ -4,7 +4,7 @@ namespace DevFreela.Core.Repositories;
 
 public interface IProjectRepository
 {
-    Task<(List<Project>, int)> GetAllAsync(string? search = null, int page = 0, int size = 10, CancellationToken cancellationToken = default);
+    Task<(List<Project>, int)> GetAllAsync(string? search = null, int page = 1, int size = 10, CancellationToken cancellationToken = default);
     Task<Project?> GetDetailsByIdAsync(long id, CancellationToken cancellationToken = default);
     Task<Project?> GetByIdAsync(long id);
     Task<long> AddAsync(Project project);

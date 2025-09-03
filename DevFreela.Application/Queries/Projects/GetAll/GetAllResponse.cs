@@ -2,7 +2,7 @@
 
 namespace DevFreela.Application.Queries.Projects.GetAll;
 
-public record GetAllResponse(IEnumerable<GetAllItemResponse> Projects, int Count);
+public record GetAllResponse(int Page, int Size, int Count, IEnumerable<GetAllItemResponse> Projects);
 
 public record GetAllItemResponse(
     long Id,

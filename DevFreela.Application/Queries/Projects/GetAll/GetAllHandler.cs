@@ -20,7 +20,7 @@ public class GetAllHandler : IRequestHandler<GetAllQuery, ResultViewModel<GetAll
 
         var projects = queryResult.Item1.Select(GetAllItemResponse.FromEntity).ToList();
         var count = queryResult.Item2;
-        var model = new GetAllResponse(projects, count);
+        var model = new GetAllResponse(request.Page, request.Size, count, projects);
 
         return ResultViewModel<GetAllResponse>.Success(model);
     }

@@ -34,7 +34,7 @@ public class ProjectRepository : IProjectRepository
             .AnyAsync(p => p.Id == id);
     }
 
-    public async Task<(List<Project>, int)> GetAllAsync(string? search = null, int page = 0, int size = 10, CancellationToken cancellationToken = default)
+    public async Task<(List<Project>, int)> GetAllAsync(string? search = null, int page = 1, int size = 10, CancellationToken cancellationToken = default)
     {
         var query = _context.Projects
             .AsNoTracking()
@@ -51,11 +51,13 @@ public class ProjectRepository : IProjectRepository
                             p.Description.Contains(search));
         }
 
-        var count = await query.CountAsync();
+        var count = await query.CountAsync(cancellationToken);
+
+        if (page < 1) page = 1;
 
         var queryResult = await query
             .OrderBy(p => p.Title)
-            .Skip(page * size)
+            .Skip((page - 1) * size)
             .Take(size)
             .ToListAsync(cancellationToken);
 
